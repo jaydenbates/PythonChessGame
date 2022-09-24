@@ -1,4 +1,4 @@
-class GameState:
+class GameState():
     def __init__(self) -> None:
         pass
     
