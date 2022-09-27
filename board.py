@@ -1,41 +1,24 @@
+import piece
 class Board():
     def __init__(self):
         self.board = []
-        self.Player1 = ["R", "N", "B", "Q", "K", "B", "N", "R"]
-        self.Player2 = ["R", "N", "B", "K", "Q", "B", "N", "R"]
+        player2Setup = [piece.Rook(True, [0,0])], [piece.Knight(True, [0,1])], [piece.Bishop(True, [0,2])], [piece.Queen(True, [0,3])], [piece.King(True, [0,4])], [piece.Bishop(True, [0,5])], [piece.Knight(True, [0,6])], [piece.Rook(True, [0,7])]
+        player1Setup = [piece.Rook(False, [7,0])], [piece.Knight(False, [7,1])], [piece.Bishop(False, [7,2])], [piece.Queen(False, [7,3])], [piece.King(False, [7,4])], [piece.Bishop(False, [7,5])], [piece.Knight(False, [7,6])], [piece.Rook(False, [7,7])]
         for i in range(8):
-            self.board.append([])
-            for j in range(8):
-                if i == 0:
-                    self.board[i].append("\033[0;34m" + self.Player1[j])
-                elif i == 1:
-                    self.board[i].append("\033[0;34m" + "P")
-                elif i == 6:
-                    self.board[i].append("\033[0;37m" + "P")
-                elif i == 7:
-                    self.board[i].append("\033[0;37m" + self.Player2[j])
-                else:
-                    self.board[i].append(" ")
+            if i == 0: #player2
+                self.board.append(player2Setup)
+            elif i == 1: 
+                for j in range(8):
+                    self.board.append([piece.Pawn(True, [1, j])])
+            elif i == 6: #player1
+                for j in range(8):
+                    self.board.append([piece.Pawn(False, [6, j])] * 8)
+            elif i == 7:
+                self.board.append(player1Setup)
+            
+
+            
 
 
     def drawBoard(self):
-        boardLength = 8
-        print("  *", end="")
-        for i in range(len(self.board)):
-            print("****", end="")
-        print()
-        for i in range(len(self.board)):
-            print(f"{boardLength - i:<2}|", end="")
-            for j in range(len(self.board[i])):
-                if self.board[i][j] != " ":
-                    print(f"{self.board[i][j]:^11}|", end="")
-                else:
-                    print(f"{self.board[i][j]:^3}|", end="")
-            print()
-        print("  *", end="")
-        for i in range(len(self.board)):
-            print("****", end="")
-        print()
-        print("   ", end="")
-        for i in range(len(self.board)):
-            print(f"{i + 1:^4}", end="")
+       pass

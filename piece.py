@@ -28,7 +28,13 @@ class Piece():
                 return "down" # piece is moving down
         else:
             # need to do math for diagonal then else for if not then completle wrong
-            return "diagonal"
+            amountDiag = abs(currentPlace[0] - nextPlace[0])
+            if amountDiag == abs(currentPlace[1] - nextPlace[1]):
+                return "diagonal"
+            # not a valid move
+            else:
+                return "notValid"
+            
 
     def checkForPiece(self, board, currentPlace, nextPlace, i):
         if board[currentPlace[0]][i] == None:
@@ -58,7 +64,7 @@ class Rook(Piece):
     def isMoveValid(self, board, currentPlace, nextPlace):
         way = super.pieceDirection(currentPlace, nextPlace)
         replace = False
-        if way != "diagonal":
+        if way != "diagonal" and way != "notValid":
             if way == "up":
                 for i in range(currentPlace[0] + 1, nextPlace[0] - 1):
                     if self.checkForPiece(board, currentPlace, nextPlace, i): # if true no piece in the way
@@ -180,7 +186,31 @@ class Knight(Piece):
         self.currentPlace = currentPlace
 
     def isMoveValid(self, board, currentPlace, nextPlace):
-        pass
+        way = self.pieceDirection(currentPlace,nextPlace)
+        # valid move
+        if currentPlace[0] == nextPlace[0] + 2 or currentPlace[0] == nextPlace[0] - 2 or currentPlace[1] == nextPlace[1] + 2 or currentPlace[1] == nextPlace[1] - 2:
+            if board[nextPlace[0]][nextPlace[1]] != None:
+                if board[nextPlace[0]][nextPlace[1]].player != self.player:
+                    self.replacePiece(board, currentPlace, nextPlace, isReplacing=True)
+                    return True
+                else:
+                    print("You cannot move to your own piece")
+                    return False
+            else:
+                self.replacePiece(board, currentPlace, nextPlace, isReplacing=False)
+                return True
+        else:
+            print("not a valid move please try again")
+            return False
+
+    def pieceDirection(self, currentPlace, nextPlace):
+        super().pieceDirection(currentPlace, nextPlace)
+
+    def checkForPiece(self, board, currentPlace, nextPlace, i):
+        super().checkForPiece(board, currentPlace, nextPlace, i)
+
+    def replacePiece(self, board, currentPlace, nextPlace, isReplacing):
+        super().replacePiece(board, currentPlace, nextPlace, isReplacing)
 
 class Bishop(Piece):
     def __init__(self, player, currentPlace):
@@ -189,6 +219,15 @@ class Bishop(Piece):
 
     def isMoveValid(self, board, currentPlace, nextPlace):
         pass
+
+    def pieceDirection(self, currentPlace, nextPlace):
+        super().pieceDirection(currentPlace, nextPlace)
+
+    def checkForPiece(self, board, currentPlace, nextPlace, i):
+        super().checkForPiece(board, currentPlace, nextPlace, i)
+
+    def replacePiece(self, board, currentPlace, nextPlace, isReplacing):
+        super().replacePiece(board, currentPlace, nextPlace, isReplacing)
 
 class Pawn(Piece):
     def __init__(self, player, currentPlace):
@@ -199,6 +238,15 @@ class Pawn(Piece):
         if self.player == True:
             pass
 
+    def pieceDirection(self, currentPlace, nextPlace):
+        super().pieceDirection(currentPlace, nextPlace)
+
+    def checkForPiece(self, board, currentPlace, nextPlace, i):
+        super().checkForPiece(board, currentPlace, nextPlace, i)
+
+    def replacePiece(self, board, currentPlace, nextPlace, isReplacing):
+        super().replacePiece(board, currentPlace, nextPlace, isReplacing)
+
 class King(Piece):
     def __init__(self, player, currentPlace):
         self.player = player
@@ -207,6 +255,15 @@ class King(Piece):
     def isMoveValid(self, board, currentPlace, nextPlace):
         pass
 
+    def pieceDirection(self, currentPlace, nextPlace):
+        super().pieceDirection(currentPlace, nextPlace)
+
+    def checkForPiece(self, board, currentPlace, nextPlace, i):
+        super().checkForPiece(board, currentPlace, nextPlace, i)
+
+    def replacePiece(self, board, currentPlace, nextPlace, isReplacing):
+        super().replacePiece(board, currentPlace, nextPlace, isReplacing)
+
 class Queen(Piece):
     def __init__(self, player, currentPlace):
         self.player = player
@@ -214,3 +271,12 @@ class Queen(Piece):
 
     def isMoveValid(self, board, currentPlace, nextPlace):
         pass
+
+    def pieceDirection(self, currentPlace, nextPlace):
+        super().pieceDirection(currentPlace, nextPlace)
+
+    def checkForPiece(self, board, currentPlace, nextPlace, i):
+        super().checkForPiece(board, currentPlace, nextPlace, i)
+
+    def replacePiece(self, board, currentPlace, nextPlace, isReplacing):
+        super().replacePiece(board, currentPlace, nextPlace, isReplacing)
