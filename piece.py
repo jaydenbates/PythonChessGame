@@ -22,9 +22,9 @@ class Piece():
                 return "\x1b[0;35;47m" + self.pieceName + "\x1b[0m" 
         else:
             if self.player:
-                return "\x1b[0;33;0m" + self.pieceName + "\x1b[0m" 
+                return "\x1b[0;33;40m" + self.pieceName + "\x1b[0m" 
             else:
-                return "\x1b[0;35;0m" + self.pieceName + "\x1b[0m" 
+                return "\x1b[0;35;40m" + self.pieceName + "\x1b[0m" 
 
 
     def pieceDirection(self, currentPlace, nextPlace):
@@ -81,12 +81,11 @@ class Piece():
                 board[nextPlace[0]][nextPlace[1]] = self
                 board[currentPlace[0]][currentPlace[1]] = None
                 self.currentPlace = [nextPlace[0], nextPlace[1]]
-                return True
         else:
-            board[nextPlace[0]][nextPlace[1]] = self
+            # changing all the values in the same column no idea why
+            board[nextPlace[0]][nextPlace[1]] = board[currentPlace[0]][currentPlace[1]]
             board[currentPlace[0]][currentPlace[1]] = None
             self.currentPlace = [nextPlace[0], nextPlace[1]]
-            return True
 
 class Rook(Piece):
     def __init__(self, player, currentPlace):
@@ -95,7 +94,7 @@ class Rook(Piece):
         self.pieceName = "R"
 
     def isMoveValid(self, board, currentPlace, nextPlace):
-        way = super.pieceDirection(currentPlace, nextPlace)
+        way = self.pieceDirection(currentPlace, nextPlace)
         replace = False
         if way != "diagonal" and way != "notValid":
             if way == "up":
@@ -104,13 +103,14 @@ class Rook(Piece):
                         if i == currentPlace[0] - 1: # no piece in the way
                             replace == True
                     else: 
+                        print("there is a piece in the way, up")
                         return False
 
                 # no piece in the next place
                 if replace == True:
                     return self.replacePiece(board, currentPlace, nextPlace)
                 else:
-                    print("error in isMoveValid")
+                    print("error in isMoveValid on going up")
                     return False
 
             elif way == "down":
@@ -119,14 +119,15 @@ class Rook(Piece):
                         if i == nextPlace[0] - 1: # no piece in the way
                             replace == True
                     else: 
-                        print("there is a piece in the way")
+                        print("there is a piece in the way, down")
                         return False
 
                 # no piece in the next place
                 if replace == True:
-                    return self.replacePiece(board, currentPlace, nextPlace)
+                    self.replacePiece(board, currentPlace, nextPlace)
+                    return True
                 else:
-                    print("error in isMoveValid")
+                    print("error in isMoveValid on going down")
                     return False
                     
             elif way == "left":
@@ -135,13 +136,14 @@ class Rook(Piece):
                         if i == currentPlace[1] - 1: # no piece in the way
                             replace == True
                     else: 
-                        print("there is a piece in the way")
+                        print("there is a piece in the way, left")
                         return False
                     # no piece in the next place
                 if replace == True:
-                    return self.replacePiece(board, currentPlace, nextPlace)
+                    self.replacePiece(board, currentPlace, nextPlace)
+                    return True
                 else:
-                    print("error in isMoveValid")
+                    print("error in isMoveValid on going down")
                     return False
             else:
                 # moving right
@@ -150,13 +152,14 @@ class Rook(Piece):
                         if i == nextPlace[1] - 1: # no piece in the way
                             replace == True
                     else: 
-                        print("there is a piece in the way")
+                        print("there is a piece in the way, right")
                         return False
                     # no piece in the next place
                 if replace == True:
-                    return self.replacePiece(board, currentPlace, nextPlace)
+                    self.replacePiece(board, currentPlace, nextPlace)
+                    return True
                 else:
-                    print("error in isMoveValid")
+                    print("error in isMoveValid on going right")
                     return False
         else:
             print("A Rook cannot move to that spot")
@@ -169,7 +172,7 @@ class Rook(Piece):
         return super().checkForPiece(board, currentPlace, nextPlace, position, way)
 
     def replacePiece(self, board, currentPlace, nextPlace):
-        return super().replacePiece(board, currentPlace, nextPlace)
+        super().replacePiece(board, currentPlace, nextPlace)
             
 
 class Knight(Piece):
@@ -181,7 +184,8 @@ class Knight(Piece):
     def isMoveValid(self, board, currentPlace, nextPlace):
         # valid move
         if currentPlace[0] == nextPlace[0] + 2 or currentPlace[0] == nextPlace[0] - 2 or currentPlace[1] == nextPlace[1] + 2 or currentPlace[1] == nextPlace[1] - 2:
-            return self.replacePiece(board, currentPlace, nextPlace)
+            self.replacePiece(board, currentPlace, nextPlace)
+            return True
         else:
             print("not a valid move please try again")
             return False
@@ -193,7 +197,7 @@ class Knight(Piece):
         return super().checkForPiece(board, currentPlace, nextPlace, i,)
 
     def replacePiece(self, board, currentPlace, nextPlace):
-        return super().replacePiece(board, currentPlace, nextPlace)
+        super().replacePiece(board, currentPlace, nextPlace)
 
 
 class Bishop(Piece):
@@ -270,7 +274,7 @@ class Bishop(Piece):
         return super().checkForPiece(board, currentPlace, nextPlace, position, way)
 
     def replacePiece(self, board, currentPlace, nextPlace):
-        return super().replacePiece(board, currentPlace, nextPlace)
+        super().replacePiece(board, currentPlace, nextPlace)
 
 
 class Pawn(Piece):
@@ -284,59 +288,64 @@ class Pawn(Piece):
         # player 2
         replace = False
         # up and down
-        if self.player:
-            if currentPlace[1] == nextPlace[1]:
-                if self.firstMove and nextPlace[0] == self.currentPlace[0] + 2:
-                    for i in range(currentPlace[0], nextPlace[0]):
-                        if self.checkForPiece(board, currentPlace, nextPlace, [i], way="down"):
-                            replace = True
+        if self.player and currentPlace[1] == nextPlace[1]:
+                if self.firstMove and nextPlace[0] == self.currentPlace[0] + 2: # first move and moves two places
+                    for i in range(currentPlace[0] + 1, nextPlace[0]): 
+                        if not self.checkForPiece(board, currentPlace, nextPlace, [i], way="down"): # checking for pieces in the way
+                            print("This is not a valid pawn move there is a piece in the way (moving two places)")
+                            return False
+                elif nextPlace[0] == self.currentPlace[0] + 1:
+                    if not self.checkForPiece(board, currentPlace, nextPlace, [currentPlace[0] + 1], way="down"):
+                            print("This is not a valid pawn move there is a piece in the way (moving one place)")
+                            return False
                 else:
-                    if self.checkForPiece(board, currentPlace, nextPlace, [currentPlace[0] + 1], way="down"):
-                            replace = True
-                if replace:
-                    self.replacePiece(board,currentPlace,nextPlace)
-                    return True
-                else:
-                    print("this is not a valid move")
+                    print("this is not a valid pawn move, you can only move down two if it is your pawns first move or one if it has used it's first move")
+                    return False
+
+                self.firstMove = False
+                self.replacePiece(board,currentPlace,nextPlace)
+                return True
+
+        # player 1
+        elif not self.player and currentPlace[1] == nextPlace[1]:
+            if self.firstMove and nextPlace[0] == self.currentPlace[0] - 2: # first move and moves two places
+                print("we made it here")
+                for i in range(nextPlace[0] + 1, currentPlace[0]):
+                    if not self.checkForPiece(board, currentPlace, nextPlace, [i], way="up"):
+                        print("This is not a valid pawn move there is a piece in the way (moving two places)")
+                        return False
+            elif nextPlace[0] == self.currentPlace[0] - 1:
+                if not self.checkForPiece(board, currentPlace, nextPlace, [currentPlace[0] - 1], way="up"):
+                    print("This is not a valid pawn move there is a piece in the way (moving one place)")
                     return False
             else:
-                print("this is not a valid move")
+                print("this is not a valid pawn move, you can only move up two if it is your pawns first move or one if it has used it's first move")
                 return False
-        elif not self.player:
-            if currentPlace[1] == nextPlace[1]:
-                if self.firstMove and nextPlace[0] == self.currentPlace[0] - 2:
-                    for i in range(currentPlace[0], nextPlace[0]):
-                        if self.checkForPiece(board, currentPlace, nextPlace, [i], way="up"):
-                            replace = True
-                else:
-                    if self.checkForPiece(board, currentPlace, nextPlace, [currentPlace[0] - 1], way="up"):
-                            replace = True
-                if replace:
-                    self.replacePiece(board,currentPlace,nextPlace)
-                    return True
-                else:
-                    print("this is not a valid move")
-                    return False
-            else:
-                print("this is not a valid move")
-                return False
+
+            self.firstMove = False
+            self.replacePiece(board,currentPlace,nextPlace)
+            return True
+
         #attacking piece
         else:
             if self.player:
                 # down left and down right
-                if board[nextPlace[0]][nextPlace[1]] != self.player and (currentPlace[1] == nextPlace[1] + 1 and currentPlace[0] == nextPlace[0] + 1) or (currentPlace[1] == nextPlace[1] - 1 and currentPlace[0] == nextPlace[0] + 1):
-                    self.replacePiece(board, currentPlace, nextPlace)
-                    return True
+                if board[nextPlace[0]][nextPlace[1]].player != self.player:
+                    if (currentPlace[1] + 1 == nextPlace[1] and currentPlace[0] + 1 == nextPlace[0]) or (currentPlace[1] - 1 == nextPlace[1] and currentPlace[0] + 1 == nextPlace[0]):
+                        self.replacePiece(board, currentPlace, nextPlace)
+                        return True
                 else:
-                    print("this is not a valid move")
+                    print("this is not a valid attacking pawn move for player 2")
                     return False
             else:
-                if board[nextPlace[0]][nextPlace[1]] != self.player and (currentPlace[1] == nextPlace[1] + 1 and currentPlace[0] == nextPlace[0] - 1) or (currentPlace[1] == nextPlace[1] - 1 and currentPlace[0] == nextPlace[0] - 1):
-                    self.replacePiece(board, currentPlace, nextPlace)
-                    return True
+                if board[nextPlace[0]][nextPlace[1]].player != self.player:
+                    if (currentPlace[1] + 1 == nextPlace[1] and currentPlace[0] - 1 == nextPlace[0]) or (currentPlace[1] - 1 == nextPlace[1] and currentPlace[0] - 1 == nextPlace[0]):
+                        self.replacePiece(board, currentPlace, nextPlace)
+                        return True
                 else:
-                    print("this is not a valid move")
+                    print("this is not a valid attacking pawn move for player 1")
                     return False
+        
 
     def pieceDirection(self, currentPlace, nextPlace):
         return super().pieceDirection(currentPlace, nextPlace)
@@ -345,7 +354,7 @@ class Pawn(Piece):
         return super().checkForPiece(board, currentPlace, nextPlace, position, way)
 
     def replacePiece(self, board, currentPlace, nextPlace):
-        return super().replacePiece(board, currentPlace, nextPlace)
+        super().replacePiece(board, currentPlace, nextPlace)
 
 
 class King(Piece):
@@ -410,7 +419,7 @@ class King(Piece):
         return super().checkForPiece(board, currentPlace, nextPlace, i)
 
     def replacePiece(self, board, currentPlace, nextPlace):
-        return super().replacePiece(board, currentPlace, nextPlace)
+        super().replacePiece(board, currentPlace, nextPlace)
 
 
 class Queen(Piece):
@@ -420,7 +429,7 @@ class Queen(Piece):
         self.pieceName = "Q"
 
     def isMoveValid(self, board, currentPlace, nextPlace):
-        way = super.pieceDirection(currentPlace, nextPlace)
+        way = self.pieceDirection(currentPlace, nextPlace)
         replace = False
         if way != "diagonal" and way != "notValid":
             if way == "up":
