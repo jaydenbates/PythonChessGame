@@ -29,20 +29,20 @@ class Piece():
 
     def pieceDirection(self, currentPlace, nextPlace):
         if currentPlace[0] == nextPlace[0] and currentPlace[1] != nextPlace[1]:
-            if currentPlace[1] < nextPlace[1]: # piece is moving left
+            if currentPlace[1] > nextPlace[1]: # piece is moving left
                 return "left"
             else:
                 return "right" # piece is moving right
         elif currentPlace[1] == nextPlace[1] and currentPlace[0] != nextPlace[0]:
-            if currentPlace[0] < nextPlace[0]:
+            if currentPlace[0] > nextPlace[0]:
                 return "up" # piece is moving up
             else:
                 return "down" # piece is moving down
         else:
             # need to do math for diagonal then else for if not then completle wrong
-            amountDiag = abs(currentPlace[0] - currentPlace[1])
+            amountDiag = abs(currentPlace[0] - nextPlace[0])
             # TODO: need to add the direction it is going diagonal
-            if amountDiag == abs(nextPlace[0] - nextPlace[1]):
+            if amountDiag == abs(nextPlace[1] - currentPlace[1]):
                 return "diagonal"
             # not a valid move
             else:
@@ -51,7 +51,9 @@ class Piece():
 
     def checkForPiece(self, board, currentPlace, nextPlace, position, way):
         if way == "diagonal":
-            if board[currentPlace[position[0]]][position[1]] == None:
+            # why do I have currentplace just need position
+            print(position)
+            if board[position[0]][position[1]] == None:
                 return True
             else: 
                 print("you cant move past a piece")
@@ -101,7 +103,7 @@ class Rook(Piece):
                 for i in range(nextPlace[0] + 1, currentPlace[0]):
                     if self.checkForPiece(board, currentPlace, nextPlace, [i], way): # if true no piece in the way
                         if i == currentPlace[0] - 1: # no piece in the way
-                            replace == True
+                            replace = True
                     else: 
                         print("there is a piece in the way, up")
                         return False
@@ -117,7 +119,7 @@ class Rook(Piece):
                 for i in range(currentPlace[0] + 1, nextPlace[0]):
                     if self.checkForPiece(board, currentPlace, nextPlace, [i], way): # if true no piece in the way
                         if i == nextPlace[0] - 1: # no piece in the way
-                            replace == True
+                            replace = True
                     else: 
                         print("there is a piece in the way, down")
                         return False
@@ -134,7 +136,7 @@ class Rook(Piece):
                 for i in range(nextPlace[1] + 1, currentPlace[1]):
                     if self.checkForPiece(board, currentPlace, nextPlace, [i], way): # if true no piece in the way
                         if i == currentPlace[1] - 1: # no piece in the way
-                            replace == True
+                            replace = True
                     else: 
                         print("there is a piece in the way, left")
                         return False
@@ -143,14 +145,14 @@ class Rook(Piece):
                     self.replacePiece(board, currentPlace, nextPlace)
                     return True
                 else:
-                    print("error in isMoveValid on going down")
+                    print("error in isMoveValid on going left")
                     return False
             else:
                 # moving right
                 for i in range(currentPlace[1] + 1, nextPlace[1]):
                     if self.checkForPiece(board, currentPlace, nextPlace, [i], way): # if true no piece in the way
                         if i == nextPlace[1] - 1: # no piece in the way
-                            replace == True
+                            replace = True
                     else: 
                         print("there is a piece in the way, right")
                         return False
@@ -210,46 +212,41 @@ class Bishop(Piece):
         way = self.pieceDirection(currentPlace, nextPlace)
         replace = False
         if way == "diagonal":
-            position = currentPlace
             # down right
             if currentPlace[0] < nextPlace[0] and currentPlace[1] < nextPlace[1]:
-                if currentPlace[0] == nextPlace[0] + 1:
+                if currentPlace[0] == nextPlace[0] - 1 and currentPlace[1] == nextPlace[1] - 1:
                     replace = True
-                for i in range(currentPlace[0] + 1, nextPlace[0]):
-                    position[0] += 1
-                    position[1] += 1
-                    if self.checkForPiece(board, currentPlace, nextPlace, position, way):
-                        replace = True
+                else:
+                    for i in range(currentPlace[0], nextPlace[0] - 1):
+                        if self.checkForPiece(board, currentPlace, nextPlace, [currentPlace[0] + i, currentPlace[1] + i], way):
+                            replace = True
             # down left
             elif currentPlace[0] < nextPlace[0] and currentPlace[1] > nextPlace[1]:
                 # moving one place
-                if currentPlace[0] == nextPlace[0] + 1:
+                if currentPlace[0] == nextPlace[0] - 1 and currentPlace[1] == nextPlace[1] + 1:
                     replace = True
-                for i in range(nextPlace[0] + 1, currentPlace[0]):
-                    position[0] += 1
-                    position[1] -= 1
-                    if self.checkForPiece(board, currentPlace, nextPlace, position, way):
-                        replace = True 
+                else:
+                    for i in range(nextPlace[0], currentPlace[0] - 1):
+                        if self.checkForPiece(board, currentPlace, nextPlace, [currentPlace[0] + i, currentPlace[1] - i], way):
+                            replace = True 
             # up right
             elif currentPlace[0] > nextPlace[0] and currentPlace[1] < nextPlace[1]:
-                if currentPlace[0] == nextPlace - 1:
+                if currentPlace[0] == nextPlace[0] + 1 and currentPlace[1] == nextPlace[1] - 1:
                     replace = True
-                for i in range(currentPlace[0] + 1, nextPlace[0]):
-                    position[0] -= 1
-                    position[1] += 1
-                    if self.checkForPiece(board, currentPlace, nextPlace, position, way):
-                        replace = True 
+                else:
+                    for i in range(nextPlace[0], currentPlace[0] - 1):
+                        if self.checkForPiece(board, currentPlace, nextPlace, [currentPlace[0] - i, currentPlace[1] + i], way):
+                            replace = True 
             # up left
             elif currentPlace[0] > nextPlace[0] and currentPlace[1] > nextPlace[1]:
-                if currentPlace[0] == nextPlace - 1:
+                if currentPlace[0] == nextPlace[0] + 1 and currentPlace[1] == nextPlace[1] + 1:
                     replace = True
-                for i in range(nextPlace[0] + 1, currentPlace[0]):
-                    position[0] -= 1
-                    position[1] -= 1
-                    if self.checkForPiece(board, currentPlace, nextPlace, position, way):
-                        replace = True 
+                else:
+                    for i in range(nextPlace[0], currentPlace[0] - 1):
+                        if self.checkForPiece(board, currentPlace, nextPlace, [currentPlace[0] - i, currentPlace[1] - i], way):
+                            replace = True 
             else:
-                print("not a valid move")
+                print("not a valid move in diagonal")
                 return False
 
             if replace:
@@ -258,13 +255,13 @@ class Bishop(Piece):
                         print("you cant move to your own piece")
                         return False
                     else:
-                        self.replacePiece(board, currentPlace,nextPlace, isReplacing=True)
+                        self.replacePiece(board, currentPlace, nextPlace)
                         return True
                 else:
-                    self.replacePiece(board, currentPlace, nextPlace, isReplacing=False)
+                    self.replacePiece(board, currentPlace, nextPlace)
                     return True
         else:
-            print("This is not a valid move")
+            print("This is not a valid move before diagonal")
             return False
 
     def pieceDirection(self, currentPlace, nextPlace):

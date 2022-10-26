@@ -20,8 +20,6 @@ while not done:
         else:
             print("This is not a place on the table")
             # break
-    print(currentPosXY)
-    print(nextPosXY)
     if valid:
         if game.move(currentPosXY, nextPosXY):
             pass
