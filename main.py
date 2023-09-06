@@ -26,6 +26,10 @@ while not done:
             # break
         else:
             print("that was not a valid move")
+    # if game.check():
+    #     pass
+    # else:
+    #     pass
     # if game.promotion():
     #     pass
     # make move

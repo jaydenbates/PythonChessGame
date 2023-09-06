@@ -1,8 +1,14 @@
+""" TODO: ADD Try Catch to find errors but not crash game. 
+        -- pawn move piece needs to be fixed on attach section. if it is not self.player then it could be none
+             -- add better error statments 
+        -- encapsolate the code so it is not so long. maybe add another class of movement and add all that there.
+        -- add feature clastling 
+        -- consider changing true false to 1 and 0 for player 1 and 2
+        -- implement turns for player 1 and 2
+
+        Diagonals dont work
+"""
 class Piece():
-    # impliment a name of the pice for the printing 
-    # in this class you can change the color and add self.name
-    # clean up code
-    # text: f"\u001b[38;2;{r};{g};{b}m", dark brown = f"\u001b[38;2;78;53;36m", cream = f"\u001b[38;2;255;243;154m"
 
     def __init__(self, player):
         # player1 is False, player2 is True
@@ -28,49 +34,115 @@ class Piece():
 
 
     def pieceDirection(self, currentPlace, nextPlace):
-        if currentPlace[0] == nextPlace[0] and currentPlace[1] != nextPlace[1]:
-            if currentPlace[1] > nextPlace[1]: # piece is moving left
-                return "left"
-            else:
-                return "right" # piece is moving right
-        elif currentPlace[1] == nextPlace[1] and currentPlace[0] != nextPlace[0]:
-            if currentPlace[0] > nextPlace[0]:
-                return "up" # piece is moving up
-            else:
-                return "down" # piece is moving down
+        amountDiag = abs(currentPlace[0] - nextPlace[0])
+        if currentPlace[0] == nextPlace[0] and currentPlace[1] != nextPlace[1] and currentPlace[1] > nextPlace[1]:
+            return "left" # moving left
+        elif currentPlace[0] == nextPlace[0] and currentPlace[1] != nextPlace[1] and currentPlace[1] < nextPlace[1]:
+            return "right" # moving right
+        elif currentPlace[1] == nextPlace[1] and currentPlace[0] != nextPlace[0] and currentPlace[0] > nextPlace[0]:
+            return "up" # moving up
+        elif currentPlace[1] == nextPlace[1] and currentPlace[0] != nextPlace[0] and currentPlace[0] < nextPlace[0]:
+            return "down" # moving down
+        elif amountDiag == abs(nextPlace[1] - currentPlace[1]) and currentPlace[0] < nextPlace[0] and currentPlace[1] < nextPlace[1]:
+            return "down right" # down right
+        elif amountDiag == abs(nextPlace[1] - currentPlace[1]) and currentPlace[0] < nextPlace[0] and currentPlace[1] > nextPlace[1]:
+            return "down left" # down left
+        elif amountDiag == abs(nextPlace[1] - currentPlace[1]) and currentPlace[0] > nextPlace[0] and currentPlace[1] < nextPlace[1]:
+            return "up right" # up right
+        elif amountDiag == abs(nextPlace[1] - currentPlace[1]) and currentPlace[0] > nextPlace[0] and currentPlace[1] > nextPlace[1]:
+            return "up left"
         else:
-            # need to do math for diagonal then else for if not then completle wrong
-            amountDiag = abs(currentPlace[0] - nextPlace[0])
-            # TODO: need to add the direction it is going diagonal
-            if amountDiag == abs(nextPlace[1] - currentPlace[1]):
-                return "diagonal"
-            # not a valid move
-            else:
-                return "notValid"
-            
+            return "notValid"
 
-    def checkForPiece(self, board, currentPlace, nextPlace, position, way):
-        if way == "diagonal":
-            # why do I have currentplace just need position
-            print(position)
-            if board[position[0]][position[1]] == None:
+            
+    def checkForAndReplacePiece(self, board, currentPlace, nextPlace, direction):
+        if direction == "up":
+            for i in range(nextPlace[0] + 1, currentPlace[0]):
+                if board[i][currentPlace[1]] == None:
+                    if i == currentPlace[0] - 1: # no piece in the way
+                        self.replacePiece(board, currentPlace, nextPlace)
+                        return True
+                else: 
+                    print("there is a piece in the way (direction == up)")
+                    return False
+        elif direction == "down":
+            for i in range(currentPlace[0] + 1, nextPlace[0]):
+                if board[i][currentPlace[1]] == None:
+                    if i == nextPlace[0] - 1: # no piece in the way
+                        self.replacePiece(board, currentPlace, nextPlace)
+                        return True
+                else: 
+                    print("there is a piece in the way (direction == down)")
+                    return False
+        elif direction == "left":
+            for i in range(nextPlace[1] + 1, currentPlace[1]):
+                if board[currentPlace[0]][i] == None:
+                    if i == currentPlace[1] - 1: # no piece in the way
+                        self.replacePiece(board, currentPlace, nextPlace)
+                        return True
+                else: 
+                    print("there is a piece in the way (direction == left)")
+                    return False
+        elif direction == "right":
+            for i in range(currentPlace[1] + 1, nextPlace[1]):
+                if board[currentPlace[0]][i] == None:
+                    if i == nextPlace[1] - 1: # no piece in the way
+                        self.replacePiece(board, currentPlace, nextPlace)
+                        return True
+                else: 
+                    print("there is a piece in the way (direction == right)")
+                    return False
+        elif direction == "down right":
+            if currentPlace[0] == nextPlace[0] - 1 and currentPlace[1] == nextPlace[1] - 1:
+                self.replacePiece(board, currentPlace, nextPlace)
                 return True
-            else: 
-                print("you cant move past a piece")
-                return False
-        else:
-            if way == "right" or way == "left":
-                if board[currentPlace[0]][position[0]] == None:
-                    return True
-                else: 
-                    print("you cant move past a piece")
-                    return False
-            else: 
-                if board[position[0]][currentPlace[1]] == None:
-                    return True
-                else: 
-                    print("you cant move past a piece")
-                    return False
+            else:
+                for i in range(currentPlace[0] - currentPlace[0] + 1, (nextPlace[0] - currentPlace[0])):
+                    # TODO: need to check if there is a piece in the way and then before the last square return true
+                    if board[i][i] == None:
+                        self.replacePiece(board, currentPlace, nextPlace)
+                        return True
+                    else: 
+                        print("there is a piece in the way (direction == down right)")
+                        return False
+        elif direction == "down left":
+            if currentPlace[0] == nextPlace[0] - 1 and currentPlace[1] == nextPlace[1] + 1:
+                self.replacePiece(board, currentPlace, nextPlace)
+                return True
+            else:
+                for i in range(currentPlace[0] - currentPlace[0] + 1, (nextPlace[0] - currentPlace[0])):
+                    if board[i][i] == None:
+                        self.replacePiece(board, currentPlace, nextPlace)
+                        return True
+                    else: 
+                        print("there is a piece in the way (direction == down left)")
+                        return False
+        elif direction == "up right":
+            if currentPlace[0] == nextPlace[0] + 1 and currentPlace[1] == nextPlace[1] - 1:
+                self.replacePiece(board, currentPlace, nextPlace)
+                return True
+            else:
+                for i in range(nextPlace[0] - nextPlace[0] + 1, (currentPlace[0] - nextPlace[0])):
+                    if board[i][i] == None:
+                        self.replacePiece(board, currentPlace, nextPlace)
+                        return True
+                    else: 
+                        print("there is a piece in the way (direction == up right)")
+                        return False
+        elif direction == "up left":
+            if currentPlace[0] == nextPlace[0] + 1 and currentPlace[1] == nextPlace[1] + 1:
+                self.replacePiece(board, currentPlace, nextPlace)
+                return True
+            else:
+                for i in range(nextPlace[0] - nextPlace[0] + 1, (currentPlace[0] - nextPlace[0])):
+                    print(range(nextPlace[0] - nextPlace[0] + 1, (currentPlace[0] - nextPlace[0])))
+                    if board[i][i] == None:
+                        self.replacePiece(board, currentPlace, nextPlace)
+                        return True
+                    elif board[i][i] == True: 
+                        print("there is a piece in the way (direction == up left)")
+                        return False
+
     
     def replacePiece(self, board, currentPlace, nextPlace):
         if board[nextPlace[0]][nextPlace[1]] != None:
@@ -96,82 +168,21 @@ class Rook(Piece):
         self.pieceName = "R"
 
     def isMoveValid(self, board, currentPlace, nextPlace):
-        way = self.pieceDirection(currentPlace, nextPlace)
-        replace = False
-        if way != "diagonal" and way != "notValid":
-            if way == "up":
-                for i in range(nextPlace[0] + 1, currentPlace[0]):
-                    if self.checkForPiece(board, currentPlace, nextPlace, [i], way): # if true no piece in the way
-                        if i == currentPlace[0] - 1: # no piece in the way
-                            replace = True
-                    else: 
-                        print("there is a piece in the way, up")
-                        return False
 
-                # no piece in the next place
-                if replace == True:
-                    return self.replacePiece(board, currentPlace, nextPlace)
-                else:
-                    print("error in isMoveValid on going up")
-                    return False
+        direction = self.pieceDirection(currentPlace, nextPlace)
 
-            elif way == "down":
-                for i in range(currentPlace[0] + 1, nextPlace[0]):
-                    if self.checkForPiece(board, currentPlace, nextPlace, [i], way): # if true no piece in the way
-                        if i == nextPlace[0] - 1: # no piece in the way
-                            replace = True
-                    else: 
-                        print("there is a piece in the way, down")
-                        return False
-
-                # no piece in the next place
-                if replace == True:
-                    self.replacePiece(board, currentPlace, nextPlace)
-                    return True
-                else:
-                    print("error in isMoveValid on going down")
-                    return False
-                    
-            elif way == "left":
-                for i in range(nextPlace[1] + 1, currentPlace[1]):
-                    if self.checkForPiece(board, currentPlace, nextPlace, [i], way): # if true no piece in the way
-                        if i == currentPlace[1] - 1: # no piece in the way
-                            replace = True
-                    else: 
-                        print("there is a piece in the way, left")
-                        return False
-                    # no piece in the next place
-                if replace == True:
-                    self.replacePiece(board, currentPlace, nextPlace)
-                    return True
-                else:
-                    print("error in isMoveValid on going left")
-                    return False
-            else:
-                # moving right
-                for i in range(currentPlace[1] + 1, nextPlace[1]):
-                    if self.checkForPiece(board, currentPlace, nextPlace, [i], way): # if true no piece in the way
-                        if i == nextPlace[1] - 1: # no piece in the way
-                            replace = True
-                    else: 
-                        print("there is a piece in the way, right")
-                        return False
-                    # no piece in the next place
-                if replace == True:
-                    self.replacePiece(board, currentPlace, nextPlace)
-                    return True
-                else:
-                    print("error in isMoveValid on going right")
-                    return False
+        if direction == "up" || direction == "down" || direction == "left" || direction == "right":
+            if self.checkForAndReplacePiece(board, currentPlace, nextPlace, direction):
+                return True
         else:
-            print("A Rook cannot move to that spot")
-            return False     
+            print("this is not a valid move for a Rook")
+            return False
 
     def pieceDirection(self, currentPlace, nextPlace):
         return super().pieceDirection(currentPlace, nextPlace)
 
-    def checkForPiece(self, board, currentPlace, nextPlace, position, way):
-        return super().checkForPiece(board, currentPlace, nextPlace, position, way)
+    def checkForAndReplacePiece(self, board, currentPlace, nextPlace, way):
+        return super().checkForAndReplacePiece(board, currentPlace, nextPlace, way)
 
     def replacePiece(self, board, currentPlace, nextPlace):
         super().replacePiece(board, currentPlace, nextPlace)
@@ -189,14 +200,14 @@ class Knight(Piece):
             self.replacePiece(board, currentPlace, nextPlace)
             return True
         else:
-            print("not a valid move please try again")
+            print("not a valid move for a knight. Please try again")
             return False
 
     def pieceDirection(self, currentPlace, nextPlace):
         return super().pieceDirection(currentPlace, nextPlace)
 
-    def checkForPiece(self, board, currentPlace, nextPlace, i, way):
-        return super().checkForPiece(board, currentPlace, nextPlace, i,)
+    def checkForAndReplacePiece(self, board, currentPlace, nextPlace, way):
+        return super().checkForAndReplacePiece(board, currentPlace, nextPlace, way)
 
     def replacePiece(self, board, currentPlace, nextPlace):
         super().replacePiece(board, currentPlace, nextPlace)
@@ -209,66 +220,19 @@ class Bishop(Piece):
         self.pieceName = "B"
 
     def isMoveValid(self, board, currentPlace, nextPlace):
-        way = self.pieceDirection(currentPlace, nextPlace)
-        replace = False
-        if way == "diagonal":
-            # down right
-            if currentPlace[0] < nextPlace[0] and currentPlace[1] < nextPlace[1]:
-                if currentPlace[0] == nextPlace[0] - 1 and currentPlace[1] == nextPlace[1] - 1:
-                    replace = True
-                else:
-                    for i in range(currentPlace[0], nextPlace[0] - 1):
-                        if self.checkForPiece(board, currentPlace, nextPlace, [currentPlace[0] + i, currentPlace[1] + i], way):
-                            replace = True
-            # down left
-            elif currentPlace[0] < nextPlace[0] and currentPlace[1] > nextPlace[1]:
-                # moving one place
-                if currentPlace[0] == nextPlace[0] - 1 and currentPlace[1] == nextPlace[1] + 1:
-                    replace = True
-                else:
-                    for i in range(nextPlace[0], currentPlace[0] - 1):
-                        if self.checkForPiece(board, currentPlace, nextPlace, [currentPlace[0] + i, currentPlace[1] - i], way):
-                            replace = True 
-            # up right
-            elif currentPlace[0] > nextPlace[0] and currentPlace[1] < nextPlace[1]:
-                if currentPlace[0] == nextPlace[0] + 1 and currentPlace[1] == nextPlace[1] - 1:
-                    replace = True
-                else:
-                    for i in range(nextPlace[0], currentPlace[0] - 1):
-                        if self.checkForPiece(board, currentPlace, nextPlace, [currentPlace[0] - i, currentPlace[1] + i], way):
-                            replace = True 
-            # up left
-            elif currentPlace[0] > nextPlace[0] and currentPlace[1] > nextPlace[1]:
-                if currentPlace[0] == nextPlace[0] + 1 and currentPlace[1] == nextPlace[1] + 1:
-                    replace = True
-                else:
-                    for i in range(nextPlace[0], currentPlace[0] - 1):
-                        if self.checkForPiece(board, currentPlace, nextPlace, [currentPlace[0] - i, currentPlace[1] - i], way):
-                            replace = True 
-            else:
-                print("not a valid move in diagonal")
-                return False
-
-            if replace:
-                if board[nextPlace[0]][nextPlace[1]] != None:
-                    if board[nextPlace[0]][nextPlace[1]].player == self.player:
-                        print("you cant move to your own piece")
-                        return False
-                    else:
-                        self.replacePiece(board, currentPlace, nextPlace)
-                        return True
-                else:
-                    self.replacePiece(board, currentPlace, nextPlace)
-                    return True
+        direction = self.pieceDirection(currentPlace, nextPlace)
+        if direction == "down right" || direction == "down left" || direction == "up right" || direction == "up left":
+            if self.checkForAndReplacePiece(board, currentPlace, nextPlace, direction):
+                return True
         else:
-            print("This is not a valid move before diagonal")
+            print("not a valid move in diagonal, Bishop")
             return False
 
     def pieceDirection(self, currentPlace, nextPlace):
         return super().pieceDirection(currentPlace, nextPlace)
 
-    def checkForPiece(self, board, currentPlace, nextPlace, position, way):
-        return super().checkForPiece(board, currentPlace, nextPlace, position, way)
+    def checkForAndReplacePiece(self, board, currentPlace, nextPlace, way):
+        return super().checkForAndReplacePiece(board, currentPlace, nextPlace, way)
 
     def replacePiece(self, board, currentPlace, nextPlace):
         super().replacePiece(board, currentPlace, nextPlace)
@@ -308,11 +272,11 @@ class Pawn(Piece):
             if self.firstMove and nextPlace[0] == self.currentPlace[0] - 2: # first move and moves two places
                 print("we made it here")
                 for i in range(nextPlace[0] + 1, currentPlace[0]):
-                    if not self.checkForPiece(board, currentPlace, nextPlace, [i], way="up"):
+                    if not self.checkForPiece(board, currentPlace, nextPlace, way="up"):
                         print("This is not a valid pawn move there is a piece in the way (moving two places)")
                         return False
             elif nextPlace[0] == self.currentPlace[0] - 1:
-                if not self.checkForPiece(board, currentPlace, nextPlace, [currentPlace[0] - 1], way="up"):
+                if not self.checkForPiece(board, currentPlace, nextPlace, way="up"):
                     print("This is not a valid pawn move there is a piece in the way (moving one place)")
                     return False
             else:
@@ -334,7 +298,7 @@ class Pawn(Piece):
                 else:
                     print("this is not a valid attacking pawn move for player 2")
                     return False
-            else:
+            elif not self.player:
                 if board[nextPlace[0]][nextPlace[1]].player != self.player:
                     if (currentPlace[1] + 1 == nextPlace[1] and currentPlace[0] - 1 == nextPlace[0]) or (currentPlace[1] - 1 == nextPlace[1] and currentPlace[0] - 1 == nextPlace[0]):
                         self.replacePiece(board, currentPlace, nextPlace)
@@ -342,13 +306,16 @@ class Pawn(Piece):
                 else:
                     print("this is not a valid attacking pawn move for player 1")
                     return False
+            else: 
+                print("this is not a valid move for a pawn")
+                return False
         
 
     def pieceDirection(self, currentPlace, nextPlace):
         return super().pieceDirection(currentPlace, nextPlace)
 
-    def checkForPiece(self, board, currentPlace, nextPlace, position, way):
-        return super().checkForPiece(board, currentPlace, nextPlace, position, way)
+    def checkForPiece(self, board, currentPlace, nextPlace, way):
+        return super().checkForAndReplacePiece(board, currentPlace, nextPlace, way)
 
     def replacePiece(self, board, currentPlace, nextPlace):
         super().replacePiece(board, currentPlace, nextPlace)
@@ -413,7 +380,7 @@ class King(Piece):
         return super().pieceDirection(currentPlace, nextPlace)
 
     def checkForPiece(self, board, currentPlace, nextPlace, i):
-        return super().checkForPiece(board, currentPlace, nextPlace, i)
+        return super().checkForAndReplacePiece(board, currentPlace, nextPlace, i)
 
     def replacePiece(self, board, currentPlace, nextPlace):
         super().replacePiece(board, currentPlace, nextPlace)
@@ -426,107 +393,18 @@ class Queen(Piece):
         self.pieceName = "Q"
 
     def isMoveValid(self, board, currentPlace, nextPlace):
-        way = self.pieceDirection(currentPlace, nextPlace)
+        direction = self.pieceDirection(currentPlace, nextPlace)
         replace = False
-        if way != "diagonal" and way != "notValid":
-            if way == "up":
-                for i in range(nextPlace[0] + 1, currentPlace[0]):
-                    if self.checkForPiece(board, currentPlace, nextPlace, [i], way): # if true no piece in the way
-                        if i == currentPlace[0] - 1: # no piece in the way
-                            replace == True
-                    else: 
-                        return False
 
-            elif way == "down":
-                for i in range(currentPlace[0] + 1, nextPlace[0]):
-                    if self.checkForPiece(board, currentPlace, nextPlace, [i], way): # if true no piece in the way
-                        if i == nextPlace[0] - 1: # no piece in the way
-                            replace == True
-                    else: 
-                        print("there is a piece in the way")
-                        return False
-                    
-            elif way == "left":
-                for i in range(nextPlace[1] + 1, currentPlace[1]):
-                    if self.checkForPiece(board, currentPlace, nextPlace, [i], way): # if true no piece in the way
-                        if i == currentPlace[1] - 1: # no piece in the way
-                            replace == True
-                    else: 
-                        print("there is a piece in the way")
-                        return False
-            else:
-                # moving right
-                for i in range(currentPlace[1] + 1, nextPlace[1]):
-                    if self.checkForPiece(board, currentPlace, nextPlace, [i], way): # if true no piece in the way
-                        if i == nextPlace[1] - 1: # no piece in the way
-                            replace == True
-                    else: 
-                        print("there is a piece in the way")
-                        return False
-
-        elif way == "diagonal":
-            position = currentPlace
-            # down right
-            if currentPlace[0] < nextPlace[0] and currentPlace[1] < nextPlace[1]:
-                if currentPlace[0] == nextPlace[0] + 1:
-                    replace = True
-                for i in range(currentPlace[0] + 1, nextPlace[0]):
-                    position[0] += 1
-                    position[1] += 1
-                    if self.checkForPiece(board, currentPlace, nextPlace, position, way):
-                        replace = True
-            # down left
-            elif currentPlace[0] < nextPlace[0] and currentPlace[1] > nextPlace[1]:
-                # moving one place
-                if currentPlace[0] == nextPlace[0] + 1:
-                    replace = True
-                for i in range(nextPlace[0] + 1, currentPlace[0]):
-                    position[0] += 1
-                    position[1] -= 1
-                    if self.checkForPiece(board, currentPlace, nextPlace, position, way):
-                        replace = True 
-            # up right
-            elif currentPlace[0] > nextPlace[0] and currentPlace[1] < nextPlace[1]:
-                if currentPlace[0] == nextPlace - 1:
-                    replace = True
-                for i in range(currentPlace[0] + 1, nextPlace[0]):
-                    position[0] -= 1
-                    position[1] += 1
-                    if self.checkForPiece(board, currentPlace, nextPlace, position, way):
-                        replace = True 
-            # up left
-            elif currentPlace[0] > nextPlace[0] and currentPlace[1] > nextPlace[1]:
-                if currentPlace[0] == nextPlace - 1:
-                    replace = True
-                for i in range(nextPlace[0] + 1, currentPlace[0]):
-                    position[0] -= 1
-                    position[1] -= 1
-                    if self.checkForPiece(board, currentPlace, nextPlace, position, way):
-                        replace = True 
-            else:
-                print("not a valid move")
-                return False
-        else:
-            print("A queen cannot move to that spot")
-            return False   
-
-        if replace:
-                if board[nextPlace[0]][nextPlace[1]] != None:
-                    if board[nextPlace[0]][nextPlace[1]].player == self.player:
-                        print("you cant move to your own piece")
-                        return False
-                    else:
-                        self.replacePiece(board, currentPlace,nextPlace, isReplacing=True)
-                        return True
-                else:
-                    self.replacePiece(board, currentPlace, nextPlace, isReplacing=False)
-                    return True
+        if direction == "up" || direction == "down" || direction == "left" || direction == "right" || direction == "down right" || direction == "down left" || direction == "up right" || direction == "up left":
+            if self.checkForAndReplacePiece(board, currentPlace, nextPlace, direction):
+                return True
 
     def pieceDirection(self, currentPlace, nextPlace):
         return super().pieceDirection(currentPlace, nextPlace)
 
-    def checkForPiece(self, board, currentPlace, nextPlace, position, way):
-        return super().checkForPiece(board, currentPlace, nextPlace, position, way)
+    def checkForAndReplacePiece(self, board, currentPlace, nextPlace, position, way):
+        return super().checkForAndReplacePiece(board, currentPlace, nextPlace, position, way)
 
     def replacePiece(self, board, currentPlace, nextPlace):
         super().replacePiece(board, currentPlace, nextPlace)

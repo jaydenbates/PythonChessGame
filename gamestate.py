@@ -5,6 +5,7 @@ from piece import Queen
 class GameState():
     def __init__(self):
         self.board = Board()
+        self.turn = True
     
     def promotion(self, upgrade, place):
         if upgrade:
