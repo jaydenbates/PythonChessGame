@@ -6,9 +6,11 @@
         -- consider changing true false to 1 and 0 for player 1 and 2
         -- implement turns for player 1 and 2
 
-        Diagonals dont work
+        Pawn not working moving one place
 
         create list of possible moves(key)
+
+        for check have piece move and if piece can hit other players king run check else pass
 """
 class Piece():
 
@@ -75,17 +77,19 @@ class Piece():
         elif direction == "up left":
             self.moveUpLeft(board,currentPlace,nextPlace)
 
+    # I think the for loops are bad and need to always go from current place to next place if it is backwards then i need to iterate by -1 so that is goes backwars
     def moveUpRight(self,board,currentPlace,nextPlace):
         if currentPlace[0] == nextPlace[0] + 1 and currentPlace[1] == nextPlace[1] - 1:
                 self.replacePiece(board, currentPlace, nextPlace)
                 return True
         else:
+            # up right should be currentplace[0] - and currentplace[1] +
             for i in range(nextPlace[0] - nextPlace[0] + 1, (currentPlace[0] - nextPlace[0])):
-                if board[i][i] == None:
+                if board[currentPlace[0] - i][currentPlace[1] + i] == None:
                     self.replacePiece(board, currentPlace, nextPlace)
                     return True
                 else: 
-                    print("there is a piece in the way (direction == up right)")
+                    print(f"there is a piece in the way (direction == up right)")
                     return False
 
     def moveUpLeft(self,board,currentPlace,nextPlace):
@@ -93,9 +97,10 @@ class Piece():
                 self.replacePiece(board, currentPlace, nextPlace)
                 return True
         else:
+            # curretnPlace[0] - currentplace[1] -
             for i in range(nextPlace[0] - nextPlace[0] + 1, (currentPlace[0] - nextPlace[0])):
                 print(range(nextPlace[0] - nextPlace[0] + 1, (currentPlace[0] - nextPlace[0])))
-                if board[i][i] == None:
+                if board[currentPlace[0] - i][currentPlace[1] - i] == None:
                     self.replacePiece(board, currentPlace, nextPlace)
                     return True
                 elif board[i][i] == True: 
@@ -107,9 +112,10 @@ class Piece():
                 self.replacePiece(board, currentPlace, nextPlace)
                 return True
         else:
+            # currentplace[0] + currentplace[1] +
             for i in range(currentPlace[0] - currentPlace[0] + 1, (nextPlace[0] - currentPlace[0])):
                 # TODO: need to check if there is a piece in the way and then before the last square return true
-                if board[i][i] == None:
+                if board[currentPlace[0] + i][currentPlace[1] + i] == None:
                     self.replacePiece(board, currentPlace, nextPlace)
                     return True
                 else: 
@@ -121,8 +127,9 @@ class Piece():
                 self.replacePiece(board, currentPlace, nextPlace)
                 return True
         else:
+            # currentplace[0] + currentplace[1] -
             for i in range(currentPlace[0] - currentPlace[0] + 1, (nextPlace[0] - currentPlace[0])):
-                if board[i][i] == None:
+                if board[currentPlace[0] + i][currentPlace[1] - i] == None:
                     self.replacePiece(board, currentPlace, nextPlace)
                     return True
                 else: 
