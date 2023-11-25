@@ -21,14 +21,17 @@ while not done:
             else:
                 print("This is not a place on the table")
                 # break
-        except:
-            print("the move was unsuccessful")
+        except Exception as e:
+            print(f"the move was unsuccessful {e}")
     if valid:
-        if game.move(currentPosXY, nextPosXY):
-            pass
+        try:
+            if game.move(currentPosXY, nextPosXY):
+                pass
             # break
-        else:
-            print("that was not a valid move")
+            else:
+                print("that was not a valid move")
+        except Exception as e:
+            print(f"error in move {e}")
     # if game.check():
     #     pass
     # else:
