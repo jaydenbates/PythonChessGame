@@ -20,3 +20,14 @@ class GameState():
         else:
             print("This is not a valid move")
             return False
+
+    # am going to check by finding the kings then looking at every direction tell it hits a piece. if that piece can move in the direction then check
+    def check(self):
+        for i in range(len(self.board)):
+            for j in range(len(self.board[i])):
+                pass
+
+
+    # if king moves in any direction if it will still be in check then end game
+    def checkMate(self):
+        pass

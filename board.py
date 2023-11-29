@@ -64,3 +64,4 @@ class Board():
         for i in range(len(self.board)):
             sb += "  " + str(i + 1) + "  "
         print(sb)
+
